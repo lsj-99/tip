@@ -1,0 +1,51 @@
+hostname        : nicecaddy
+IP              : 192.168.100.180
+SSH Port        : 22
+Root Account    : root    / !bear1234@
+Freesia Account : freesia / #freesia4321!
+DISK            : OS /dev/sdb3 4TB, SSD /dev/sda 250GB
+MEMORY          : 32 GB
+
+Component Settings
+                | MEMORY |  Port  | ETC
+zk              |   2G   |  2181  |  
+NoSQL           |   4G   |  3000  | 
+MariaDB         |   -    |  3306  | Account : root / 123456, freesia / freesia1234
+Tomcat          |   2G   |  8080  | http 
+StatusManager   |   1G   |    -   | 
+
+
+mariadb에 nicecaddyapi 계정 설정 방법
+
+1. mysql root 계정 비밀번호 변경
+freesia install 후 mariadb의 초기 root 계정은 root / 123456으로 설정되어 있음.
+[nicecaddy(freesia):/home/freesia ] mysqladmin -uroot -p123456 password \!creek1234@ 로 변경.
+
+
+2. freesia 계정에 모든 권한 부여
+[nicecaddy(freesia):/home/freesia ] mysql -uroot -p\!creek1234@로 접속
+MariaDB [(none)]> GRANT ALL PRIVILEGES ON *.* TO 'freesia'@'%';
+MariaDB [(none)]> GRANT ALL PRIVILEGES ON *.* TO 'freesia'@'localhost';
+
+MariaDB [(none)]> show GRANTS FOR freesia;로 권한 확인 가능
+
+3. nicecaddyapi 계정 및 database 생성 후 권한 부여
+MariaDB [(none)]> CREATE database nicecaddy;
+MariaDB [(none)]> GRANT ALL PRIVILEGES ON nicecaddy.* TO 'nicecaddyapi'@'%' IDENTIFIED BY 'apip@ssw0rd';
+MariaDB [(none)]> GRANT ALL PRIVILEGES ON nicecaddy.* TO 'nicecaddyapi'@'localhost' IDENTIFIED BY 'apip@ssw0rd';
+MariaDB [(none)]> flush privileges;
+
+MariaDB [(none)]> SHOW GRANTS FOR nicecaddyapi;로 권한 확인 가능
+
+4. /home/freesia/apps/mariadb/my.cnf 수정
+vi /home/freesia/apps/mariadb/my.cnf
+
+[mysqld]항목 맨 아래에 lower_case_table_names=1 추가
+[nicecaddy(freesia):/home/freesia ] fsysctl.sh restart db 로 mariadb 재 구동 및 설정값 반영
+
+MariaDB [(none)]> show variables like 'lower%'; 로 설정 확인 가능
+
+* character set 설정
+/home/freesia/apps/mariadb/my.cnf에 character-set-server=utf8이 기본으로 설정되어 있음.
+
+MariaDB [(none)]> show variables like 'c%';로 설정 확인 가능

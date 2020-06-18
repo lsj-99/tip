@@ -1,0 +1,12 @@
+bootstrap.seccomp: false
+cluster.name: dpad-node
+node.name: dpad01-elastic
+node.master: true
+node.data: true
+network.host: 10.10.76.112
+transport.tcp.port: 9300
+http.port: 9200
+discovery.zen.ping.unicast.hosts: ["10.10.76.112:9300", "10.10.76.113:9300", "10.10.76.114:9300"]
+discovery.zen.minimum_master_nodes: 2
+http.cors.enabled: true
+http.cors.allow-origin: "*"
